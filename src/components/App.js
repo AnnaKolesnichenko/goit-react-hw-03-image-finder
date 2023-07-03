@@ -1,3 +1,5 @@
+import ImageGallery from "./ImageGallery/ImageGallery";
+
 export const App = () => {
   return (
     <div
@@ -10,7 +12,8 @@ export const App = () => {
         color: '#010101'
       }}
     >
-      PIXABAY
+      
+      <ImageGallery/>
     </div>
   );
 };
