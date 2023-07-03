@@ -40,24 +40,24 @@ onModalClose = () => {
   });
 }
 
-onSearchQuery = (data) => {
-  this.setState({searchQuery: data.inputValue});  
-}
+// onSearchQuery = (data) => {
+//   this.setState({searchQuery: data.inputValue});  
+// }
 
 
 //searchForm submit and setting query and page for the first search
-// onSubmitSearch = (e) => {
-//   e.preventDefault();
-//   this.setState({
-//     searchQuery: e.currentTarget.query.value,
-//     loading: true,
-//     images: []
-//   });
-//   this.ImageGallery(this.state.searchQuery, this.state.currentPage);
-// }
+onSubmitSearch = (e) => {
+  e.preventDefault();
+  this.setState({
+    searchQuery: e.currentTarget.query.value,
+    loading: true,
+    images: []
+  });
+  this.ImageGallery(this.state.searchQuery, this.state.currentPage);
+}
 
 //uploading more pages upon current search
-onPageUpload =() => {
+onPageUpload = () => {
   this.setState({
     loading: true,
     page: this.state.currentPage + 1,
@@ -66,18 +66,20 @@ onPageUpload =() => {
 }
 
 
-async fetchImages(searchQuery, currentPage) {
+async fetchImages(query, page) {
     try {
       this.setState({loading: true});
-      const images = await fetchPixabay(searchQuery, currentPage);
-      this.setState((state) => ({
-        images: [...state.images, images],
-      }));
+      const images = await fetchPixabay(query, page);
+      this.setState((state) => {
+        return {
+            images: [...state.images, images],
+        };
+      });
 
       if(images.length < 12) {
         this.setState({btnShow: false});
       } 
-      else if (images.length >= 12) {
+      else if (images.length > 12) {
         this.setState({btnShow: true});
       }
 
@@ -111,7 +113,7 @@ async fetchImages(searchQuery, currentPage) {
               largeImageURL={this.state.modal.largeImageURL} 
               onModalClose={this.onModalClose} 
         />}
-        <SearchBar onSubmit={this.onSearchQuery}/>   
+        <SearchBar onSubmit={this.onSubmitSearch}/>   
         {/* {this.state.loading && <Loader/> }     */}
         {/* {images.length > 0 ? <ImageGallery images={images}/> : <Loader/>} */}
         {/* {this.state.error && <ErrorMessage/>} */}

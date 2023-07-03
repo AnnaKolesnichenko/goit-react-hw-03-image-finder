@@ -1,36 +1,35 @@
 import css from './searchBar.module.css';
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 import { Component } from 'react';
 
 class SearchBar extends Component {
-    state = {
-        inputValue: ''
-    }
+    // state = {
+    //     inputValue: ''
+    // }
 
-    handleFormInput = (e) => {
-        this.setState({inputValue: e.target.value})
-    };
+    // handleFormInput = (e) => {
+    //     this.setState({inputValue: e.target.value})
+    // };
 
-    handleFormSubmit = (e) => {
-        e.preventDefault();
-        this.props.onSubmit({...this.state})
-        this.resetForm();
-    };
+    // handleFormSubmit = (e) => {
+    //     e.preventDefault();
+    //     this.props.onSubmit({...this.state})
+    //     this.resetForm();
+    // };
 
-    resetForm = () => {
-        this.setState({inputValue: ''})
-    };
+    // resetForm = () => {
+    //     this.setState({inputValue: ''})
+    // };
 
     render () {
         return (
             <header className={css.searchbar}>
-                <form className={css.searchform} onSubmit={this.handleFormSubmit}>
+                <form className={css.searchform} onSubmit={this.props.onSubmit}>
                     <button type="submit" className={css.searchform_button} >
                         <span className="button-label">Search</span>
                     </button>
     
                     <input
-                        onChange={this.handleFormInput}
                         className={css.searchform_input}
                         type="text"
                         autoComplete="off"
