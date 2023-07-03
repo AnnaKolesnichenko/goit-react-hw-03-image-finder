@@ -28,27 +28,30 @@ class App extends Component {
 
 
 //searchForm submit and setting query and page for the first search
-onSubmitSearch = (e) => {
-  e.preventDefault();
+onSubmitSearch = (query) => {
+  // e.preventDefault();
+  // const searchQuery = e.target.query.value;
   this.setState({
-    searchQuery: e.target.query.value,
+    searchQuery: query,
     loading: true,
-    images: []
+    images: [],
+    currentPage: 1
   });
-  this.fetchImages(this.state.searchQuery, this.state.currentPage);
+  this.fetchImages(query, 1);
+  // this.fetchImages(query, this.state.currentPage);
 }
 
 //uploading more pages upon current search
 onPageUpload = () => {
   this.setState({
     loading: true,
-    page: this.state.currentPage + 1,
+    currentPage: this.state.currentPage + 1,
   });
   this.fetchImages(this.state.searchQuery, this.state.currentPage + 1);
 }
 
 
-async fetchImages(query, page) {
+fetchImages = async(query, page) => {
     try {
       this.setState({loading: true});
       const images = await fetchPixabay(query, page);
@@ -61,7 +64,7 @@ async fetchImages(query, page) {
       if(images.length < 12) {
         this.setState({btnShow: false});
       } 
-      else if (images.length > 12) {
+      else if (images.length === 12) {
         this.setState({btnShow: true});
       }
 
