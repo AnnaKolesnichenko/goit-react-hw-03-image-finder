@@ -21,24 +21,6 @@ class App extends Component {
     error: false
 };
 
-//work with modal
-onModalOpen = (data) => {
-  this.setState({
-    modal: {
-      isOpen: true,
-      largeImageURL: data
-    },
-  });
-};
-
-onModalClose = () => {
-  this.setState({
-    modal: {
-      isOpen: false,
-      largeImageURL: ''
-    },
-  });
-}
 
 // onSearchQuery = (data) => {
 //   this.setState({searchQuery: data.inputValue});  
@@ -49,11 +31,11 @@ onModalClose = () => {
 onSubmitSearch = (e) => {
   e.preventDefault();
   this.setState({
-    searchQuery: e.currentTarget.query.value,
+    searchQuery: e.target.query.value,
     loading: true,
     images: []
   });
-  this.ImageGallery(this.state.searchQuery, this.state.currentPage);
+  this.fetchImages(this.state.searchQuery, this.state.currentPage);
 }
 
 //uploading more pages upon current search
@@ -72,7 +54,7 @@ async fetchImages(query, page) {
       const images = await fetchPixabay(query, page);
       this.setState((state) => {
         return {
-            images: [...state.images, images],
+            images: [...state.images, ...images],
         };
       });
 
@@ -90,7 +72,24 @@ async fetchImages(query, page) {
     }
 }
 
+//work with modal
+onModalOpen = (data) => {
+  this.setState({
+    modal: {
+      isOpen: true,
+      largeImageURL: data
+    },
+  });
+};
 
+onModalClose = () => {
+  this.setState({
+    modal: {
+      isOpen: false,
+      largeImageURL: ''
+    },
+  });
+}
 
   render () {
     const {images, loading, error, btnShow} = this.state;
