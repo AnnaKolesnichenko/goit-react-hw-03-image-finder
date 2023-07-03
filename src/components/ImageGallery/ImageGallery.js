@@ -1,44 +1,34 @@
-import { Component } from "react";
-// import ImageGalleryItem from "components/ImageGalleryItem/ImageGalleryItem";
-import fetchPixabay from "services/PixabayService";
 
-class ImageGallery extends Component{
-    state = {
-        modal: {isOpen: false, visibleData: null},
-        images: [],
-        loading: true,
-        error: false
-    }
+import ImageGalleryItem from "components/ImageGalleryItem/ImageGalleryItem";
+import PropTypes from 'prop-types';
 
+import css from './imageGallery.module.css';
 
-    async componentDidMount() {
-        try {
-            const images = await fetchPixabay();
-            console.log(images);
-            this.setState({images: images});
-        } catch (error) {
+const ImageGallery = ({images, onModalOpen}) => {
 
-        } finally {
-
-        }
-    }
-
-    onLoadPictures = () => {
-        
-    }
-
-    render() {
-        return(
-        <ul className="gallery">
-                {this.state.images.length > 0 && this.state.images.map(image => {
-   
-                    return (<li className="gallery-item" key={image.id}>
-                                <img src={image.previewURL} alt={image.tags} />
-                            </li>)
-                    })}
-            </ul>
-        )
-    }
+    return(
+    <ul className={css.gallery}>
+            {images.length > 0 && images.map(image => (
+                <ImageGalleryItem 
+                    key={image.id}
+                    item={image}
+                    onModalOpen={onModalOpen}
+                />
+            ))
+        }       
+        </ul>
+    )
 }
+
+ImageGallery.prototype = {
+    onModalOpen: PropTypes.func.isRequired,
+    images: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        webformatURL: PropTypes.string.isRequired,
+        largeImageURL: PropTypes.string.isRequired,
+        tags: PropTypes.string.isRequired, 
+    }))
+}
+
 
 export default ImageGallery;
