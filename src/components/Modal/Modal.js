@@ -4,11 +4,17 @@ import { Component } from 'react';
 
 class Modal extends Component {
 
-    onKeyDown = (e) => {
-        if (e.keyCode === 'Escape' || e.currentTarget === e.target) {
-          return this.props.onModalClose();
+    onOverlayClick = (e) => {
+        if (e.currentTarget === e.target) {
+          this.props.onModalClose();
         }
       };
+
+      onKeyDown = (e) => {
+        if(e.keyCode === 27) {
+            this.props.onModalClose();
+        }
+      }
 
     componentDidMount() {
         window.addEventListener('keydown', this.onKeyDown);
@@ -22,7 +28,7 @@ class Modal extends Component {
     render() {
         const {largeImageURL} = this.props;
         return (
-            <div className={css.overlay} onClick={this.onKeyDown}>            
+            <div className={css.overlay} onClick={this.onOverlayClick}>            
                 <div className={css.modal}>
                     <img src={largeImageURL} alt='' />
                 </div>
