@@ -1,4 +1,5 @@
 import { Component } from "react";
+import Notiflix from 'notiflix';
 import fetchPixabay from "services/PixabayService";
 
 import ImageGallery from "./ImageGallery/ImageGallery";
@@ -13,13 +14,70 @@ class App extends Component {
 
   state = {
     modal: {isOpen: false, largeImageURL: ''},
-    btnShow: false,
     images: [],
+    totalImages: 0,
     searchQuery: '',
     currentPage: 1,
     loading: false,
     error: false
 };
+
+componentDidUpdate = async (_, prevState) => {
+  const {searchQuery, currentPage} = this.state;
+  if(searchQuery !== prevState.searchQuery || currentPage !== prevState.currentPage) {
+    this.fetchImages(searchQuery, currentPage);
+  }
+}
+
+// onSearchQuery = (data) => {
+//   this.setState({searchQuery: data.inputValue});  
+// }
+
+
+//searchForm submit and setting query and page for the first search
+onSubmitSearch = (query) => {
+  this.setState({
+    searchQuery: query,
+    images: [],
+    currentPage: 1
+  });
+  this.fetchImages(query, 1);
+  // this.fetchImages(query, this.state.currentPage);
+}
+
+//uploading more pages upon current search
+onPageUpload = () => {
+  this.setState((prev) => ({
+    currentPage: prev.currentPage + 1,
+  }));
+  this.fetchImages(this.state.searchQuery, this.state.currentPage + 1);
+}
+
+
+fetchImages = async(query, page) => {
+    try {
+      this.setState({loading: true});
+
+      const data = await fetchPixabay(query, page);
+
+      if(data.totalHits === 0) {
+        Notiflix.Notify.warning(`There is no results upon your ${query}, please try again...`);
+        return;
+      }
+
+      this.setState((prevState) => {
+        return {
+            images: [...prevState.images, ...data.hits],
+            totalImages: data.totalHits,
+        };
+      });
+
+    } catch (error) {
+      this.setState({error: true});
+    } finally {
+      this.setState({loading: false})
+    }
+}
 
 //work with modal
 onModalOpen = (data) => {
@@ -40,63 +98,10 @@ onModalClose = () => {
   });
 }
 
-// onSearchQuery = (data) => {
-//   this.setState({searchQuery: data.inputValue});  
-// }
-
-
-//searchForm submit and setting query and page for the first search
-onSubmitSearch = (e) => {
-  e.preventDefault();
-  this.setState({
-    searchQuery: e.currentTarget.query.value,
-    loading: true,
-    images: []
-  });
-  this.ImageGallery(this.state.searchQuery, this.state.currentPage);
-}
-
-//uploading more pages upon current search
-onPageUpload = () => {
-  this.setState({
-    loading: true,
-    page: this.state.currentPage + 1,
-  });
-  this.fetchImages(this.state.searchQuery, this.state.currentPage + 1);
-}
-
-
-async fetchImages(query, page) {
-    try {
-      this.setState({loading: true});
-      const images = await fetchPixabay(query, page);
-      this.setState((state) => {
-        return {
-            images: [...state.images, images],
-        };
-      });
-
-      if(images.length < 12) {
-        this.setState({btnShow: false});
-      } 
-      else if (images.length > 12) {
-        this.setState({btnShow: true});
-      }
-
-    } catch (error) {
-      this.setState({error: true, loading: false});
-    } finally {
-      this.setState({loading: false})
-    }
-}
-
-
-
   render () {
-    const {images, loading, error, btnShow} = this.state;
-    const spinner = loading ? <Loader/> : null;
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const galleryContent = !(error || loading) ? <ImageGallery images={images} onModalOpen={this.onModalOpen}/> : null;
+    const {images, loading, error, totalImages, modal} = this.state;
+    const showBtn = !loading && images.length !== totalImages;
+   
     return (
       <div
         // style={{
@@ -108,19 +113,19 @@ async fetchImages(query, page) {
         //   color: '#010101'
         // }}
       >
-        {this.state.modal.isOpen && 
+    
+        <SearchBar onSubmit={this.onSubmitSearch}/>   
+        {loading && <Loader/> }    
+        {images.length > 0 && <ImageGallery images={images} onModalOpen={this.onModalOpen}/> }
+        {error && <ErrorMessage/>}
+        
+        {showBtn && <Button onPageUpload={this.onPageUpload}/>}
+
+        {modal.isOpen && 
             <Modal 
               largeImageURL={this.state.modal.largeImageURL} 
               onModalClose={this.onModalClose} 
         />}
-        <SearchBar onSubmit={this.onSubmitSearch}/>   
-        {/* {this.state.loading && <Loader/> }     */}
-        {/* {images.length > 0 ? <ImageGallery images={images}/> : <Loader/>} */}
-        {/* {this.state.error && <ErrorMessage/>} */}
-        {galleryContent}
-        {errorMessage}
-        {spinner}
-        {btnShow && <Button onPageUpload={this.onPageUpload}/>}
         
       </div>
     );
